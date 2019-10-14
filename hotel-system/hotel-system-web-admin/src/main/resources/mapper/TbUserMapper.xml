@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace相当于类名-->
+<mapper namespace="com.hln.hotel.system.web.admin.dao.TbUserDao">
+<!--    是不过三，三则重构-->
+<!--    sql 片段-->
+    <sql id="tbUserColumons">
+        a.id,
+        a.username,
+        a.password,
+        a.phone,
+        a.email,
+        a.is_sys_admin,
+        a.created,
+        a.updated
+    </sql>
+    <!--    查询所有-->
+    <!--    id：相当于方法名 resultType相当于返回值类型-->
+    <select id="selectAll" resultType="com.hln.hotel.system.domain.TbUser">
+        SELECT
+        <!-- 导入tbUserColumons-->
+        <include refid="tbUserColumons"/>
+
+        FROM tb_user AS a
+    </select>
+<!--    通过邮箱查询用户信息-->
+    <select id="getByEmail" resultType="TbUser">
+        SELECT
+        <include refid="tbUserColumons"/>
+        FROM tb_user AS a
+        WHERE a.email = #{email}
+    </select>
+<!--    根据id查询用户信息-->
+    <select id="getById" resultType="TbUser">
+        SELECT
+        <include refid="tbUserColumons"/>
+        FROM tb_user AS a
+        WHERE a.id = #{id}
+    </select>
+<!-- 添加语句-->
+    <insert id="insert">
+        INSERT INTO tb_user (
+          username,
+          password,
+          phone,
+          email,
+          created,
+          updated
+        )
+        VALUES
+          (
+            #{username},
+            #{password},
+            #{phone},
+            #{email},
+            #{created},
+            #{updated}
+          );
+    </insert>
+<!--    修改语句-->
+    <update id="update">
+        UPDATE
+          tb_user
+        SET
+          username = #{username},
+          password = #{password},
+          phone = #{phone},
+          email = #{email},
+          updated = #{updated}
+        WHERE id = #{id};
+    </update>
+
+<!--    删除-->
+    <delete id="delete">
+        DELETE
+        FROM tb_user
+        WHERE id = #{id}
+    </delete>
+<!--    批量删除-->
+    <delete id="deleteMutli">
+        DELETE
+        FROM tb_user
+        WHERE
+        id IN
+        <foreach collection="array" open="(" separator="," close=")" item="id">
+        #{id}
+        </foreach>
+    </delete>
+<!--    分页-->
+    <select id="page" resultType="TbUser" parameterType="java.util.Map">
+        SELECT
+        <include refid="tbUserColumons"/>
+        FROM tb_user AS a
+        <where>
+            <if test="entityParams.username != null and entityParams.username !=''">
+                AND a.username LIKE CONCAT('%', #{entityParams.username}, '%')
+            </if>
+            <if test="entityParams.email != null and entityParams.email != ''">
+                AND a.email LIKE CONCAT('%', #{entityParams.email}, '%')
+            </if>
+            <if test="entityParams.phone != null and entityParams.phone != ''">
+                AND a.phone LIKE CONCAT('%', #{entityParams.phone}, '%')
+            </if>
+        </where>
+        LIMIT #{start}, #{length}
+    </select>
+<!--    查询总数-->
+    <select id="count" resultType="java.lang.Integer" parameterType="tbUser">
+        SELECT COUNT(*)
+        FROM tb_user
+        <where>
+            <if test="username != null and username !=''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>
