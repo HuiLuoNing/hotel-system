@@ -16,6 +16,7 @@
         <module>hotel-system-commons</module>
         <module>hotel-system-domain</module>
         <module>hotel-system-web-admin</module>
+
     </modules>
 
 </project>
